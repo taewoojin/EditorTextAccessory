@@ -27,7 +27,7 @@ public enum ButtonAlignment {
     case right, left
 }
 
-class EditorTextAccessory: UIView, TextAccessory {
+open class EditorTextAccessory: UIView, TextAccessory {
     var separatorLineView = UIView()
     var accessoryView = UIView()
     var buttonInset:CGFloat = 0
@@ -36,15 +36,15 @@ class EditorTextAccessory: UIView, TextAccessory {
     var leftButtonPosition:CGFloat = 0
     var rightButtonPosition:CGFloat = 0
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    convenience init() {
+    convenience public init() {
         self.init(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 60))
     }
     
-    convenience init(accessoryViewFrame:CGRect, topViewFrame:CGRect) {
+    convenience public init(accessoryViewFrame:CGRect, topViewFrame:CGRect) {
         var frame:CGRect = accessoryViewFrame
         frame.origin.y += topViewFrame.height
         self.init(frame: frame)
@@ -54,7 +54,7 @@ class EditorTextAccessory: UIView, TextAccessory {
         self.addSubview(topView)
     }
     
-    override init(frame: CGRect) {
+    override public init(frame: CGRect) {
         super.init(frame: frame)
         self.frame.origin = .zero
         self.frame.size = frame.size
@@ -69,11 +69,11 @@ class EditorTextAccessory: UIView, TextAccessory {
         self.addSubview(separatorLineView)
     }
     
-    func addTopView(_ view:UIView) {
+    public func addTopView(_ view:UIView) {
         self.topView.addSubview(view)
     }
     
-    func setConfigure(accessoryViewOffset:CGFloat = 0, separatorLineOffset:CGFloat = 0) {
+    public func setConfigure(accessoryViewOffset:CGFloat = 0, separatorLineOffset:CGFloat = 0) {
         if accessoryViewOffset > 0 {
             self.accessoryView.frame.size.width -= accessoryViewOffset * 2
             self.accessoryView.frame.origin.x = accessoryViewOffset
@@ -87,7 +87,7 @@ class EditorTextAccessory: UIView, TextAccessory {
         }
     }
     
-    func addButton(width:CGFloat, iconImage:UIImage, alignment:ButtonAlignment, targetEvent:@escaping (_ sender:UIButton)->() ) {
+    public func addButton(width:CGFloat, iconImage:UIImage, alignment:ButtonAlignment, targetEvent:@escaping (_ sender:UIButton)->() ) {
         let button = UIButton(frame: CGRect(x: 0, y: 0, width: width, height: accessoryView.frame.height))
         
         switch alignment {
