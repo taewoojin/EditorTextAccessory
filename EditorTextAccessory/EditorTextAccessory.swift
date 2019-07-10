@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 protocol TextAccessory {
-    func addButton(width:CGFloat, iconImage:UIImage, alignment:ButtonAlignment, targetEvent:@escaping (_ sender:UIButton)->())
+    func addButton(type: AccessoryButtonType, width:CGFloat, iconImage:UIImage, alignment:ButtonAlignment, targetEvent:@escaping (_ sender:UIButton)->()) -> AccessoryButton
     func setConfigure(accessoryViewOffset:CGFloat, separatorLineOffset:CGFloat)
     func addTopView(_ view:UIView)
     
@@ -27,7 +27,7 @@ public enum ButtonAlignment {
     case right, left
 }
 
-open class EditorTextAccessory: UIView, TextAccessory {
+public class EditorTextAccessory: UIView, TextAccessory {
     var separatorLineView = UIView()
     var accessoryView = UIView()
     var buttonInset:CGFloat = 0
@@ -44,13 +44,15 @@ open class EditorTextAccessory: UIView, TextAccessory {
         self.init(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 60))
     }
     
-    convenience public init(accessoryViewFrame:CGRect, topViewFrame:CGRect) {
-        var frame:CGRect = accessoryViewFrame
-        frame.origin.y += topViewFrame.height
+    convenience public init(accessoryViewFrame: CGRect, topViewFrame: CGRect? = nil) {
+        let topViewContainer = topViewFrame ?? CGRect.zero
+        
+        var frame = accessoryViewFrame
+        frame.origin.y += topViewContainer.height
         self.init(frame: frame)
         
-        self.frame.size.height += topViewFrame.height
-        self.topView.frame = topViewFrame
+        self.frame.size.height += topViewContainer.height
+        self.topView.frame = topViewContainer
         self.addSubview(topView)
     }
     
@@ -87,8 +89,12 @@ open class EditorTextAccessory: UIView, TextAccessory {
         }
     }
     
-    public func addButton(width:CGFloat, iconImage:UIImage, alignment:ButtonAlignment, targetEvent:@escaping (_ sender:UIButton)->() ) {
-        let button = UIButton(frame: CGRect(x: 0, y: 0, width: width, height: accessoryView.frame.height))
+    public func addButton(type: AccessoryButtonType,
+                          width:CGFloat, iconImage:UIImage,
+                          alignment:ButtonAlignment,
+                          targetEvent:@escaping (_ sender:UIButton)->() ) -> AccessoryButton {
+        let button = AccessoryButton(frame: CGRect(x: 0, y: 0, width: width, height: accessoryView.frame.height))
+        //        let button = UIButton(frame: CGRect(x: 0, y: 0, width: width, height: accessoryView.frame.height))
         
         switch alignment {
         case .left:
@@ -105,6 +111,7 @@ open class EditorTextAccessory: UIView, TextAccessory {
         }
         
         self.accessoryView.addSubview(button)
+        return button
     }
 }
 
@@ -121,9 +128,31 @@ fileprivate class ClosureWrapper {
 }
 
 extension UIControl {
-    func addHandle(for controlEvents: UIControlEvents, _ closure: @escaping ()->()) {
+    func addHandle(for controlEvents: UIControl.Event, _ closure: @escaping ()->()) {
         let sleeve = ClosureWrapper(closure)
         addTarget(sleeve, action: #selector(ClosureWrapper.invoke), for: controlEvents)
         objc_setAssociatedObject(self, String(format: "[%d]", arc4random()), sleeve, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
     }
+}
+
+
+public enum AccessoryButtonType {
+    case textAlign
+    case picture
+    case video
+    case text
+    case hideKeyboard
+}
+
+public class AccessoryButton: UIButton {
+    public var textAlignment: NSTextAlignment?
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+    }
+    
+    required public init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
 }
